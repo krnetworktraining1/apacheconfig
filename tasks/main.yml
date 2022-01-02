@@ -1,0 +1,28 @@
+- name: Install apache
+  yum:
+     name: "{{ web_svc }}"
+     state: installed
+
+
+- name: Start apache  
+  service:
+      name: "{{ web_svc }}"
+      state: started
+      enabled: true
+
+
+- include_vars: test.yml
+
+- name: Copy website code
+  copy:
+      src: data/
+      dest: "{{ web_root }}"
+
+
+- name: Deploy apache.conf.j2 files
+  template:
+      src: apache.conf.j2
+      dest: "{{ apache_config }}"
+  notify: restart_apache
+      
+- import_tasks: firewall.yml
